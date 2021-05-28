@@ -1,42 +1,46 @@
 package main.FloydWarshallAlgorithm;
 
+import main.utils.Utils;
+
 import java.io.*;
 
 public class FloydWarshall {
-    static int DIM = 8;
 
-    public static void main(String[] args) {
-        int[][] weights = new int[DIM][DIM];
-        int[][] vertexes = new int[DIM][DIM];
-
-        createWeightMatrixFromFile(weights);
+    public void printFloydWarshall(int pathStart, int pathFinish,
+                                   int[][] weights, int DIM) {
         printMatrix(weights, "Weights Matrix");
 
+        //Создание матрицы вершин
+        int[][] vertexes = new int[DIM][DIM];
         createVertexMatrix(weights, vertexes);
         printMatrix(vertexes, "Vertexes Matrix");
 
         int[][] stepWeights = new int[DIM][DIM];
         int[][] stepVertexes = new int[DIM][DIM];
 
-        startFloydWarshall(weights, vertexes, stepWeights, stepVertexes);
+        //Алгоритм Флойда-Уоршалла
+        startFloydWarshall(weights, vertexes, stepWeights,
+                stepVertexes, DIM);
 
         System.out.println("Результат:");
         printMatrix(weights, "Weights");
         printMatrix(vertexes, "Vertexes");
 
-        printGraphConnection(weights);
+        //Проверка на связность графа
+        printGraphConnection(weights, DIM);
 
-        int pathStart = 3;
-        int pathFinish = 8;
+        //Печать пути между 2 вершинами
         printPath(pathStart, pathFinish, vertexes);
     }
 
-    private static void printPath(int startVertex, int finishVertex, int[][] vertexes) {
+    private static void printPath(int startVertex, int finishVertex,
+                                  int[][] vertexes) {
         if (vertexes[startVertex - 1][finishVertex - 1] == 100) {
             System.out.println("Нет пути!");
             return;
         }
-        System.out.println("\nПуть из " + startVertex + " в " + finishVertex + ": ");
+        System.out.println("\nПуть из " + startVertex + " в " +
+                finishVertex + ": ");
         System.out.print(startVertex);
         while (startVertex != finishVertex)
         {
@@ -45,7 +49,7 @@ public class FloydWarshall {
         }
     }
 
-    private static void printGraphConnection(int[][] matrix) {
+    private static void printGraphConnection(int[][] matrix, int DIM) {
         System.out.print("Связность: ");
         for (int i = 0; i < DIM; i++) {
             for (int j = 0; j < DIM; j++) {
@@ -60,8 +64,11 @@ public class FloydWarshall {
 
     }
 
-    private static void startFloydWarshall(int[][] weights, int[][] vertexes,
-                                           int[][] stepWeights, int[][] stepVertexes) {
+    private static void startFloydWarshall(int[][] weights,
+                                           int[][] vertexes,
+                                           int[][] stepWeights,
+                                           int[][] stepVertexes,
+                                           int DIM) {
         for (int k = 0; k < DIM; k++) {
             for (int i = 0; i < DIM; i++) {
                 for (int j = 0; j < DIM; j++) {
@@ -78,21 +85,21 @@ public class FloydWarshall {
             System.out.println("Step = " + (k + 1));
             System.out.print("Weights:");
             System.out.print("                                      ");
-            System.out.print("Vertexes:");
+            System.out.print("Vertexes:\n");
             for (int i = 0; i < DIM; i++) {
-                printChangedWeights(weights, stepWeights, i);
+                printChangedWeights(weights, stepWeights, i, DIM);
                 System.out.print("      ");
-                printChangedVertexes(vertexes, stepVertexes, i);
+                printChangedVertexes(vertexes, stepVertexes, i, DIM);
                 System.out.println();
             }
             System.out.println();
 
-            resetMatrix(stepWeights);
-            resetMatrix(stepVertexes);
+            resetMatrix(stepWeights, DIM);
+            resetMatrix(stepVertexes, DIM);
         }
     }
 
-    private static void resetMatrix(int[][] matrix) {
+    private static void resetMatrix(int[][] matrix, int DIM) {
         for (int i = 0; i < DIM; i++) {
             for (int j = 0; j < DIM; j++) {
                 matrix[i][j] = 0;
@@ -101,7 +108,8 @@ public class FloydWarshall {
     }
 
     private static void printChangedVertexes(int[][] vertexes,
-                                             int[][] stepVertexes, int i) {
+                                             int[][] stepVertexes,
+                                             int i, int DIM) {
         for (int j = 0; j < DIM; j++) {
             if (stepVertexes[i][j] == 1) {
                 if (vertexes[i][j] < 10) {
@@ -120,7 +128,8 @@ public class FloydWarshall {
     }
 
     private static void printChangedWeights(int[][] weights,
-                                            int[][] stepWeights, int i) {
+                                            int[][] stepWeights,
+                                            int i, int DIM) {
         for (int j = 0; j < DIM; j++) {
             if (stepWeights[i][j] == 1) {
                 if (weights[i][j] < 10) {
@@ -152,54 +161,7 @@ public class FloydWarshall {
         }
     }
 
-    private static void createWeightMatrixFromFile(int[][] matrix) {
-        try {
-            FileReader fr = new FileReader("src/resources/matrix.txt");
-            BufferedReader reader = new BufferedReader(fr);
-            String line = reader.readLine();
-            while (line != null) {
-                int firstVertex = Integer.parseInt(line.substring(4, 5)) - 1;
-                int secondVertex = Integer.parseInt(line.substring(7, 8)) - 1;
-                int weight = 0;
-                if (line.length() < 14) {
-                    weight = Integer.parseInt(line.substring(11, 12));
-                } else if (line.length() == 14) {
-                    weight = Integer.parseInt(line.substring(11, 13));
-                }
-                matrix[firstVertex][secondVertex] = weight;
-                matrix[secondVertex][firstVertex] = weight;
-                line = reader.readLine();
-            }
-            setMatrixInfinity(matrix);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private static void setMatrixInfinity(int[][] matrix) {
-        for (int i = 0; i < matrix.length; i++) {
-            for (int j = 0; j < matrix[i].length; j++) {
-                if (matrix[i][j] == 0 && i != j) {
-                    matrix[i][j] = 100;
-                }
-            }
-        }
-    }
-
-    private static void printMatrix(int[][] matrix, String name) {
-        System.out.println(name + ": ");
-        for (int[] rows : matrix) {
-            for (int cols : rows) {
-                if (cols < 10) {
-                    System.out.print("  " + cols + " ");
-                } else if (cols == 100) {
-                    System.out.print("inf ");
-                } else {
-                    System.out.print(" " + cols + " ");
-                }
-            }
-            System.out.println();
-        }
-        System.out.println();
+    public void printMatrix(int[][] matrix, String name) {
+        Utils.printMatrixUtils(matrix, name);
     }
 }
