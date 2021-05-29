@@ -2,16 +2,17 @@ package main;
 
 import main.DijkstraAlgorithm.Dijkstra;
 import main.FloydWarshallAlgorithm.FloydWarshall;
+import main.PrimsAlgorithm.Prim;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
 public class Main {
 
-    static int DIM = 8;
-
     public static void main(String[] args) {
+        int DIM = getMaxVertexIndex();
         //Создание матрицы весов из файла
         int[][] weights = new int[DIM][DIM];
         int[] pathVertexes = new int[2];
@@ -24,12 +25,14 @@ public class Main {
         //Создание объектов алгоритмов
         FloydWarshall floydWarshall = new FloydWarshall();
         Dijkstra dijkstra = new Dijkstra();
+        Prim prim = new Prim();
 
         //Печать результатов
         floydWarshall.printFloydWarshall(pathVertexes[0], pathVertexes[1], weights, DIM);
         cloneMatrices(clonedWeights, weights, DIM);
         dijkstra.printDijkstra(pathVertexes[0], pathVertexes[1], weights, DIM);
         cloneMatrices(clonedWeights, weights, DIM);
+        prim.printPrim(weights, DIM);
     }
 
     private static void cloneMatrices(int[][] sourceMatrix, int[][] distMatrix, int DIM) {
@@ -38,6 +41,33 @@ public class Main {
                 distMatrix[i][j] = sourceMatrix[i][j];
             }
         }
+    }
+
+    private static int getMaxVertexIndex() {
+        int maxVertexIndex = 0;
+        try {
+            FileReader fileReader = new FileReader("src/resources/matrix.txt");
+            BufferedReader reader = new BufferedReader(fileReader);
+            String line = reader.readLine();
+            boolean runFlag = true;
+            while (runFlag) {
+                if (line.endsWith(".")) {
+                    runFlag = false;
+                }
+                int firstVertex = Integer.parseInt(line.substring(4, 5));
+                int secondVertex = Integer.parseInt(line.substring(7, 8));
+                if (firstVertex > maxVertexIndex) {
+                    maxVertexIndex = firstVertex;
+                }
+                if (secondVertex > maxVertexIndex) {
+                    maxVertexIndex = secondVertex;
+                }
+                line = reader.readLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return maxVertexIndex;
     }
 
     private static void createWeightMatrixFromFile(int[][] matrix, int[] pathVariables) {
