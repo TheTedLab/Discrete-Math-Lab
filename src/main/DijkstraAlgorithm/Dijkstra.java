@@ -7,19 +7,25 @@ public class Dijkstra {
     private static void dijkstra(int[][] weights, int startVertex,
                                  int endVertex) {
 
+        //Создание вершин, весов и посещений
         int vertexes = weights[0].length;
         int[] smallestWeights = new int[vertexes];
         boolean[] added = new boolean[vertexes];
 
+        //Инициализация вершин бесконечностью и посещений false
         for (int vertexIndex = 0; vertexIndex < vertexes; vertexIndex++) {
             smallestWeights[vertexIndex] = Integer.MAX_VALUE;
             added[vertexIndex] = false;
         }
+
+        //Помечаем расстояние от источника до самого себя как 0
         smallestWeights[startVertex] = 0;
 
+        //Массив родителей, для восстановления пути
         int[] parents = new int[vertexes];
         parents[startVertex] = NO_PARENT;
 
+        //Нахождение кратчайшего пути для всех вершин
         for (int i = 1; i < vertexes; i++) {
             int nearestVertex = -1;
             int smallestWeight = Integer.MAX_VALUE;
@@ -30,8 +36,10 @@ public class Dijkstra {
                     smallestWeight = smallestWeights[vertexIndex];
                 }
             }
+            //Пометка о выполнении текущей вершины
             added[nearestVertex] = true;
 
+            //Обновление кратчайших путей с учетом текущей вершины
             for (int vertexIndex = 0; vertexIndex < vertexes; vertexIndex++) {
                 int edgeWeight = weights[nearestVertex][vertexIndex];
 
@@ -44,7 +52,9 @@ public class Dijkstra {
             }
         }
 
+        //Печать результатов всех кратчайших путей
         printSolution(startVertex, smallestWeights, parents);
+        //Печать кратчайшего пути между двумя вершинами
         printPathBetweenVertexes(startVertex, endVertex, smallestWeights, parents);
     }
 
@@ -76,6 +86,7 @@ public class Dijkstra {
             } else {
                 System.out.print(distances[vertexIndex] + " \t");
             }
+            //Печать пути
             printPath(vertexIndex, parents);
         }
     }
@@ -85,6 +96,7 @@ public class Dijkstra {
         if (currentVertex == NO_PARENT) {
             return;
         }
+        //Рекурсия
         printPath(parents[currentVertex], parents);
         System.out.print((currentVertex + 1) + " ");
     }
