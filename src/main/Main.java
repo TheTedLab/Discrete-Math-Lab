@@ -3,24 +3,39 @@ package main;
 import main.DijkstraAlgorithm.Dijkstra;
 import main.FloydWarshallAlgorithm.FloydWarshall;
 import main.PrimsAlgorithm.Prim;
+import main.utils.GraphVisual.EdgeNode;
+import main.utils.GraphVisual.GraphVisualization;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class Main {
 
     public static void main(String[] args) {
+
+        //Получение количества вершин
         int DIM = getMaxVertexIndex();
+
+        //Создание списка ребер графа с вершинами
+        ArrayList<EdgeNode> edgeList = new ArrayList<>();
+
         //Создание матрицы весов из файла
         int[][] weights = new int[DIM][DIM];
         int[] pathVertexes = new int[2];
-        createWeightMatrixFromFile(weights, pathVertexes);
+        createWeightMatrixFromFile(weights, pathVertexes, edgeList);
 
         //Клонирование матриц
         int[][] clonedWeights = new int[DIM][DIM];
         cloneMatrices(weights, clonedWeights, DIM);
+
+        //Визуализация полученного графа
+        GraphVisualization.visualGraph(DIM, edgeList,
+                "graph", 0.8, 0.001);
+
+        //Очиска списка ребер после визуализации
+        edgeList.clear();
 
         //Создание объектов алгоритмов
         FloydWarshall floydWarshall = new FloydWarshall();
@@ -32,9 +47,14 @@ public class Main {
         cloneMatrices(clonedWeights, weights, DIM);
         dijkstra.printDijkstra(pathVertexes[0], pathVertexes[1], weights, DIM);
         cloneMatrices(clonedWeights, weights, DIM);
-        prim.printPrim(weights, DIM);
+        prim.printPrim(weights, DIM, edgeList);
+
+        //Визуализация минимального остовного дерева
+        GraphVisualization.visualGraph(DIM, edgeList,
+                "Prim-graph", 0.8, 0.000001);
     }
 
+    //Клонирование матриц
     private static void cloneMatrices(int[][] sourceMatrix, int[][] distMatrix, int DIM) {
         for (int i = 0; i < DIM; i++) {
             for (int j = 0; j < DIM; j++) {
@@ -43,6 +63,7 @@ public class Main {
         }
     }
 
+    //Получение максимального индекса вершины
     private static int getMaxVertexIndex() {
         int maxVertexIndex = 0;
         try {
@@ -70,7 +91,9 @@ public class Main {
         return maxVertexIndex;
     }
 
-    private static void createWeightMatrixFromFile(int[][] matrix, int[] pathVariables) {
+    //Создание матрицы весов из файла
+    private static void createWeightMatrixFromFile(int[][] matrix, int[] pathVariables,
+                                                   ArrayList<EdgeNode> edgeList) {
         try {
             //Чтение весов ребер матрицы из файла
             FileReader fr = new FileReader("src/resources/matrix.txt");
@@ -91,6 +114,10 @@ public class Main {
                 }
                 matrix[firstVertex][secondVertex] = weight;
                 matrix[secondVertex][firstVertex] = weight;
+
+                //Добавление ребра в список на визуализацию
+                edgeList.add(new EdgeNode(firstVertex + 1, secondVertex + 1,
+                        weight, "endArrow=none;"));
                 line = reader.readLine();
             }
             setMatrixInfinity(matrix);
@@ -113,6 +140,7 @@ public class Main {
         }
     }
 
+    //Переназначение весов-бесконечностей
     private static void setMatrixInfinity(int[][] matrix) {
         for (int i = 0; i < matrix.length; i++) {
             for (int j = 0; j < matrix[i].length; j++) {
@@ -122,4 +150,5 @@ public class Main {
             }
         }
     }
+
 }

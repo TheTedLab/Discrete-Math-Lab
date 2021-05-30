@@ -1,6 +1,9 @@
 package main.PrimsAlgorithm;
 
+import main.utils.GraphVisual.EdgeNode;
+
 import java.lang.*;
+import java.util.ArrayList;
 
 public class Prim {
 
@@ -20,18 +23,25 @@ public class Prim {
     }
 
     //Печать дерева
-    private static void printMinTree(int[] parent, int[][] graph, int vertexes)
+    private static void printMinTree(int[] parent, int[][] graph, int vertexes,
+                                     ArrayList<EdgeNode> edgeList)
     {
         System.out.println("\n\nМинимальное остовное дерево: ");
         System.out.println("Ребро \tВес");
         for (int i = 1; i < vertexes; i++) {
+            //Печать
             System.out.println((parent[i] + 1) + " - " +
                     (i + 1) + "\t" + graph[i][parent[i]]);
+
+            //Добавление ребра в список на визуализацию
+            edgeList.add(new EdgeNode((parent[i] + 1), (i + 1),
+                    graph[i][parent[i]], "edgeArrow=none;"));
         }
     }
 
     //Конструирование минимального остовного дерева
-    private static void constructMinTree(int[][] graph, int vertexes)
+    private static void constructMinTree(int[][] graph, int vertexes,
+                                         ArrayList<EdgeNode> edgeList)
     {
         //Массив для хранения дерева
         int[] parent = new int[vertexes];
@@ -78,10 +88,12 @@ public class Prim {
         }
 
         //Печать сконструированного дерева
-        printMinTree(parent, graph, vertexes);
+        printMinTree(parent, graph, vertexes, edgeList);
     }
 
-    public void printPrim(int[][] graph, int vertexes) {
-        constructMinTree(graph, vertexes);
+    //Вызов алгоритма Прима
+    public void printPrim(int[][] graph, int vertexes,
+                          ArrayList<EdgeNode> edgeList) {
+        constructMinTree(graph, vertexes, edgeList);
     }
 }
