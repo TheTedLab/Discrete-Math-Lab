@@ -1,5 +1,6 @@
 package main.utils.GraphVisual;
 
+//Класс ребра графа с вершинами
 public class EdgeNode {
     private final int firstVertex;
     private final int secondVertex;

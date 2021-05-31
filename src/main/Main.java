@@ -34,7 +34,7 @@ public class Main {
         GraphVisualization.visualGraph(DIM, edgeList,
                 "graph", 0.8, 0.001);
 
-        //Очиска списка ребер после визуализации
+        //Очистка списка ребер после визуализации
         edgeList.clear();
 
         //Создание объектов алгоритмов
