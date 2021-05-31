@@ -210,4 +210,3 @@ public class GraphVisualization extends JFrame {
         return new Optimal(diffX, diffY, difference, maxCordX, maxCordY);
     }
 }
-
